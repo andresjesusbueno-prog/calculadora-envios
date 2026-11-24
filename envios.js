@@ -10,7 +10,7 @@ function calcularEnvio(subtotal) {
   if (typeof subtotal !== 'number' || !Number.isInteger(subtotal) || subtotal < 0) {
     throw new RangeError('El subtotal debe ser un número entero y no negativo.');
   }
-  return subtotal > LIMITE_ENVIO_GRATIS ? 0 : COSTO_ENVIO;
+  return subtotal >= LIMITE_ENVIO_GRATIS ? 0 : COSTO_ENVIO;
 }
 
 if (typeof module !== 'undefined' && module.exports) {
