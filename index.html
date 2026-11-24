@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de envío</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: #f3f5f9; color: #1f2937; margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    main { background: #fff; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,.08); width: 100%; max-width: 420px; }
+    h1 { font-size: 1.4rem; margin: 0 0 .25rem; }
+    p.regla { margin: 0 0 1.5rem; color: #6b7280; font-size: .9rem; }
+    label { display: block; font-weight: 600; margin-bottom: .4rem; }
+    input { width: 100%; padding: .7rem; font-size: 1rem; border: 1px solid #d1d5db; border-radius: 8px; }
+    input:focus { outline: 2px solid #2563eb; border-color: transparent; }
+    button { margin-top: 1rem; width: 100%; padding: .75rem; font-size: 1rem; font-weight: 600; color: #fff; background: #2563eb; border: none; border-radius: 8px; cursor: pointer; }
+    button:hover { background: #1d4ed8; }
+    #resultado { margin-top: 1.25rem; padding: .9rem; border-radius: 8px; font-weight: 600; display: none; }
+    #resultado.ok { display: block; background: #ecfdf5; color: #065f46; }
+    #resultado.error { display: block; background: #fef2f2; color: #991b1b; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Calculadora de envío</h1>
+    <p class="regla">Envío gratis desde 100.000 COP. Por debajo, el envío cuesta 8.000 COP.</p>
+    <form id="formulario" novalidate>
+      <label for="subtotal">Subtotal de la compra (COP)</label>
+      <input id="subtotal" name="subtotal" type="text" inputmode="numeric" placeholder="Ej: 100000" autocomplete="off">
+      <button type="submit">Calcular</button>
+    </form>
+    <div id="resultado" role="status" aria-live="polite"></div>
+  </main>
+
+  <script src="envios.js"></script>
+  <script>
+    const formatoCOP = new Intl.NumberFormat('es-CO');
+    const formulario = document.getElementById('formulario');
+    const campo = document.getElementById('subtotal');
+    const resultado = document.getElementById('resultado');
+
+    function mostrar(texto, tipo) {
+      resultado.textContent = texto;
+      resultado.className = tipo;
+    }
+
+    formulario.addEventListener('submit', (evento) => {
+      evento.preventDefault();
+      const texto = campo.value.trim();
+
+      if (texto === '') {
+        mostrar('Ingresa un subtotal para calcular el envío.', 'error');
+        return;
+      }
+      if (!/^\d+$/.test(texto)) {
+        mostrar('El subtotal debe ser un número entero y no negativo, sin puntos ni comas.', 'error');
+        return;
+      }
+
+      try {
+        const envio = calcularEnvio(Number(texto));
+        mostrar(`Envío: ${formatoCOP.format(envio)} COP`, 'ok');
+      } catch (error) {
+        mostrar(error.message, 'error');
+      }
+    });
+  </script>
+</body>
+</html>
